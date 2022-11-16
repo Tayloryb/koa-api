@@ -1,52 +1,38 @@
-// const Koa = require("koa");
-// const Koa = require('koa')
-// const Router = require("koa-router");
-// const { koaBody } = require("koa-body");
-// const cors = require("@koa/cors");
-import Koa from 'koa'
-import path from 'path'
-import Router from 'koa-router'
-import { koaBody } from 'koa-body'
-import cors from '@koa/cors'
-import compose from 'koa-compose'
-import statics from 'koa-static'
+import Koa from "koa";
+import path from "path";
+import { koaBody } from "koa-body";
+import cors from "@koa/cors";
+import compress from 'koa-compress'
+import compose from "koa-compose";
+import statics from "koa-static";
+import router from "./routes/routes";
 
 const app = new Koa();
-const router = new Router();
+
+const isDevMode = process.env.NODE_ENV === "production" ? false : true;
 
 /**
  * 使用koa-conpose 集成中间件
  */
 const middlewares = compose([
   koaBody(),
-  statics(path.join(__dirname, '../public')),
-  cors()
-])
-app.use(koaBody())
-// console.log('koaBody :>> ', koaBody);
-// const body = koaBody
-console.log('111111 :>> ', 31311111113);
+  statics(path.join(__dirname, "../public")),
+  cors(),
+]);
 
 
-router.prefix('/api')
-router.post("/user", async (ctx) => {
-  console.log("ctx :>> ", ctx.request.body, );
-  ctx.body = {
-    ...ctx.request.body
-  }
-});
+/**
+ * compress 压缩中间件
+ */
+if (!isDevMode) {
+  app.use(compress())
+}
 
-router.get('/get', (ctx) => {
-  const query = ctx.request.query
-  console.log('request :>> ', query, query.encodeid);
-  ctx.body = {
-    id: query.encodeid
-  }
-})
+// app.use((ctx, next) => {
+//   console.log('ctx.request :>> ', ctx.request);
+//   next()
+// })
 
-app
-  .use(middlewares)
-  .use(router.routes())
-  .use(router.allowedMethods())
+app.use(middlewares).use(router());
 
 app.listen("9800");
