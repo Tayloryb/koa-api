@@ -17,7 +17,7 @@ const isDevMode = process.env.NODE_ENV === "production" ? false : true;
 const middlewares = compose([
   koaBody(),
   statics(path.join(__dirname, "../public")),
-  cors(),
+  cors()
 ]);
 
 
@@ -28,10 +28,7 @@ if (!isDevMode) {
   app.use(compress())
 }
 
-// app.use((ctx, next) => {
-//   console.log('ctx.request :>> ', ctx.request);
-//   next()
-// })
+
 
 app.use(middlewares).use(router());
 
